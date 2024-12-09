@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const multer = require('multer');
 const path = require('path');
+const session = require('express-session');
+const passport = require('passport');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -65,6 +68,32 @@ app.post('/add', upload.single('image'), async (req, res) => {
   await newCoolItem.save();
   res.redirect('/');
 });
+
+app.post('/removeAll', async (req, res) => {
+  try {
+ 
+    const items = await CoolStuff.find();
+
+    for (const item of items) {
+      if (item.imagePath) {
+        const imagePath = path.join(__dirname, 'public', item.imagePath);
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.error(`Error deleting image file for ${item.title}:`, err);
+          }
+        });
+      }
+    }
+
+    await CoolStuff.deleteMany({});
+
+    res.redirect('/');
+  } catch (error) {
+    console.error('Error removing all items:', error);
+    res.status(500).send('Error removing all items.');
+  }
+});
+
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('Server started on port 3000');
