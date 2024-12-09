@@ -69,9 +69,19 @@ app.post('/add', upload.single('image'), async (req, res) => {
   res.redirect('/');
 });
 
+app.get('/confirmRemoveAll', (req, res) => {
+  res.render('confirmRemoveAll');
+});
+
 app.post('/removeAll', async (req, res) => {
+  const adminPassword = req.body.adminPassword;
+  const correctPassword = 'somepassword';
+
+  if (adminPassword !== correctPassword) {
+    return res.status(403).send('Incorrect password.');
+  }
+
   try {
- 
     const items = await CoolStuff.find();
 
     for (const item of items) {
@@ -94,8 +104,26 @@ app.post('/removeAll', async (req, res) => {
   }
 });
 
+app.post('/remove/:id', async (req, res) => {
+  try {
+    const item = await CoolStuff.findById(req.params.id);
+    if (item && item.imagePath) {
+      const imagePath = path.join(__dirname, 'public', item.imagePath);
+      fs.unlink(imagePath, (err) => {
+        if (err) {
+          console.error(`Error deleting image file for ${item.title}:`, err);
+        }
+      });
+    }
+    await CoolStuff.findByIdAndDelete(req.params.id);
+    res.redirect('/');
+  } catch (error) {
+    console.error('Error deleting item:', error);
+    res.status(500).send('Error deleting item');
+  }
+});
+
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('Server started on port 3000');
 });
-
