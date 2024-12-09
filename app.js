@@ -6,6 +6,7 @@ const path = require('path');
 const session = require('express-session');
 const passport = require('passport');
 const fs = require('fs');
+const favicon = require('serve-favicon');
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.set('view engine', 'ejs');
 // Middleware
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
+app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
 // Set storage engine for multer
 const storage = multer.diskStorage({
