@@ -28,10 +28,7 @@ async function copyImages() {
   }
 }
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(process.env.MONGO_URI);
 
 const coolStuffSchema = new mongoose.Schema({
   title: String,
@@ -150,8 +147,17 @@ const coolItems = [
         description: 'I live next to this park in India.',
         imagePath: '/uploads/parkinindia.png',
         location: {
-            lat: 28.5258,
-            lng: 77.1587,
+            lat: 28.5110,
+            lng: 77.1643,
+        },
+    },
+    {
+        title: 'Puerto Rico',
+        description: 'This place is cool because Nelson is from here',
+        imagePath: '/uploads/pleasegivemeextrapoints.png',
+        location: {
+            lat: 18.4674,
+            lng: -66.1110,
         },
     },
 ];
@@ -160,10 +166,7 @@ async function insertFakeData() {
   try {
     await copyImages();
 
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGO_URI);
 
     await CoolStuff.insertMany(coolItems);
     console.log('Fake data inserted successfully.');
